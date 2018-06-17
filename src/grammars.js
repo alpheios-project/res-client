@@ -21,7 +21,7 @@ export default class Grammars {
    * @return {Promise[]} Array of Promises, one for each request. They will be either fulfilled with
    * a Definition object or resolved with an error if request cannot be made/failed/timeout expired.
    */
-  static fetchResources (feature, requestOptions) {
+  static fetchResources (feature, requestOptions, logger = null) {
     let options = Object.assign(Grammars.defaults, requestOptions)
 
     let requests = []
@@ -29,7 +29,12 @@ export default class Grammars {
       let adapters = Grammars.getGrammarAdapters(feature.languageID)
       if (!adapters || adapters.length === 0) { return [] } // No adapters found for this language
       requests = adapters.map(adapter => {
-        console.log(`Preparing a request to "${adapter.config.description}"`)
+        if (logger) {
+          logger.log(`Preparing a request to "${adapter.config.description}"`)
+        } else {
+          console.log(`Preparing a request to "${adapter.config.description}"`)
+        }
+
         return new Promise((resolve, reject) => {
           let timeout = 0
           if (options.timeout > 0) {
@@ -41,7 +46,11 @@ export default class Grammars {
           try {
             adapter.getResources(feature)
               .then(value => {
-                console.log(`A url has been returned from "${adapter.config.description}"`, value)
+                if (logger) {
+                  logger.log(`A url has been returned from "${adapter.config.description}"`, value)
+                } else {
+                  console.log(`A url has been returned from "${adapter.config.description}"`, value)
+                }
                 if (timeout) { window.clearTimeout(timeout) }
                 // value is a Definition object wrapped in a Proxy
                 resolve(value)
@@ -57,7 +66,11 @@ export default class Grammars {
 
       return requests
     } catch (error) {
-      console.log(`Unable to fetch resources due to: ${error}`)
+      if (logger) {
+        logger.log(`Unable to fetch resources due to: ${error}`)
+      } else {
+        console.log(`Unable to fetch resources due to: ${error}`)
+      }
       return []
     }
   }
