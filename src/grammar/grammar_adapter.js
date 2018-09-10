@@ -57,7 +57,6 @@ class GrammarResAdapter extends BaseResourceAdapter {
     let baseUrl = this.getConfig('base_url')
     let timestamp = new Date().getTime()
     let resources = []
-    console.log(found)
     for (let item of found) {
       for (let url of item) {
         let [file, anchor] = url.split('#')
